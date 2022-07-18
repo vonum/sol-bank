@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "test": "mocha --exit --recursive"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.1.0",
+    "@openzeppelin/contracts": "^4.7.0",
+    "@openzeppelin/test-environment": "^0.1.9",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "dotenv": "^16.0.1",
+    "web3": "^1.7.4"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "hardhat": "^2.10.1",
+    "mocha": "^10.0.0"
+  }
+}
