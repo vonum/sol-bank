@@ -38,11 +38,12 @@ contract Bank is Ownable {
     }
 
     function round() public view returns (uint8) {
-        require(block.timestamp > t0 + 2 * t, "Rounds not yet started");
+        uint256 _t = t;
+        require(block.timestamp > t0 + 2 * _t, "Rounds not yet started");
 
-        if (block.timestamp > t0 + 4 * t) {
+        if (block.timestamp > t0 + 4 * _t) {
             return 2;
-        } else if (block.timestamp > t0 + 3 * t) {
+        } else if (block.timestamp > t0 + 3 * _t) {
             return 1;
         } else  {
             return 0;
