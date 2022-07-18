@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Bank is Ownable {
     IERC20 public erc20Token;
 
-    uint256 public t;
-    uint256 public t0;
+    uint256 public immutable t;
+    uint256 public immutable t0;
 
     uint256 public rewardPool;
     uint256[3] public rewardPools;
