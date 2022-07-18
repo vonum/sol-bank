@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Bank is Ownable {
-    IERC20 public erc20Token;
+    IERC20 public immutable erc20Token;
 
     uint256 public immutable t;
     uint256 public immutable t0;
@@ -25,29 +25,6 @@ contract Bank is Ownable {
         erc20Token = _erc20Token;
         t0 = block.timestamp;
         t = _t; // 1 == 1 seconds
-    }
-
-    modifier depositPeriod {
-        require(block.timestamp <= t0 + t, "Deposit period has ended");
-        _;
-    }
-
-    modifier withdrawPeriod {
-        require(block.timestamp > t0 + 2 * t, "Withdraw period has not started");
-        _;
-    }
-
-    function round() public view returns (uint8) {
-        uint256 _t = t;
-        require(block.timestamp > t0 + 2 * _t, "Rounds not yet started");
-
-        if (block.timestamp > t0 + 4 * _t) {
-            return 2;
-        } else if (block.timestamp > t0 + 3 * _t) {
-            return 1;
-        } else  {
-            return 0;
-        }
     }
 
     function supplyReward(uint256 value) external onlyOwner returns (bool) {
@@ -69,29 +46,14 @@ contract Bank is Ownable {
         return true;
     }
 
-    function _calculateRewards(address user) private view returns (uint256[3] memory) {
-        uint256[3] memory rewards;
-        uint8 r = round();
-        // 0. get round
-        // 1. calculate percent of deposit
-        // 2. calculate percent of each reward pool
-        uint256 depositPercent = _calculatePercent(deposits[user], totalDeposit);
-
-        for (uint8 i = 0; i <= 2; i++) {
-            if (i <= r) {
-                rewards[i] = _calculateReward(rewardPools[i], depositPercent);
-            }
-        }
-
-        return rewards;
+    modifier depositPeriod {
+        require(block.timestamp <= t0 + t, "Deposit period has ended");
+        _;
     }
 
-    function _calculateReward(uint256 pool, uint256 percent) private pure returns (uint256) {
-        return (pool * percent) / 100;
-    }
-
-    function _calculatePercent(uint256 part, uint256 total) private pure returns (uint256) {
-        return (part * 100) / total;
+    modifier withdrawPeriod {
+        require(block.timestamp > t0 + 2 * t, "Withdraw period has not started");
+        _;
     }
 
     function withdraw() external withdrawPeriod returns (bool) {
@@ -122,5 +84,43 @@ contract Bank is Ownable {
         emit Deposit(msg.sender, value);
 
         return true;
+    }
+
+    function round() public view returns (uint8) {
+        uint256 _t = t;
+        require(block.timestamp > t0 + 2 * _t, "Rounds not yet started");
+
+        if (block.timestamp > t0 + 4 * _t) {
+            return 2;
+        } else if (block.timestamp > t0 + 3 * _t) {
+            return 1;
+        } else  {
+            return 0;
+        }
+    }
+
+    function _calculateRewards(address user) private view returns (uint256[3] memory) {
+        uint256[3] memory rewards;
+        uint8 r = round();
+        // 0. get round
+        // 1. calculate percent of deposit
+        // 2. calculate percent of each reward pool
+        uint256 depositPercent = _calculatePercent(deposits[user], totalDeposit);
+
+        for (uint8 i = 0; i <= 2; i++) {
+            if (i <= r) {
+                rewards[i] = _calculateReward(rewardPools[i], depositPercent);
+            }
+        }
+
+        return rewards;
+    }
+
+    function _calculateReward(uint256 pool, uint256 percent) private pure returns (uint256) {
+        return (pool * percent) / 100;
+    }
+
+    function _calculatePercent(uint256 part, uint256 total) private pure returns (uint256) {
+        return (part * 100) / total;
     }
 }
