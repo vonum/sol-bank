@@ -68,22 +68,21 @@ contract Bank is Ownable {
         return true;
     }
 
-    function _takeTotalReward(address user) private returns (uint256) {
-        uint256 reward;
+    function _calculateRewards(address user) private view returns (uint256[3] memory) {
+        uint256[3] memory rewards;
         uint8 r = round();
         // 0. get round
         // 1. calculate percent of deposit
         // 2. calculate percent of each reward pool
-        // 3. sum rewards
         uint256 depositPercent = _calculatePercent(deposits[user], totalDeposit);
 
-        for (uint8 i = 0; i <= r; i++) {
-            uint256 poolReward = _calculateReward(rewardPools[i], depositPercent);
-            rewardPools[i] -= poolReward;
-            reward += poolReward;
+        for (uint8 i = 0; i <= 2; i++) {
+            if (i <= r) {
+                rewards[i] = _calculateReward(rewardPools[i], depositPercent);
+            }
         }
 
-        return reward;
+        return rewards;
     }
 
     function _calculateReward(uint256 pool, uint256 percent) private pure returns (uint256) {
@@ -95,15 +94,21 @@ contract Bank is Ownable {
     }
 
     function withdraw() external withdrawPeriod returns (bool) {
+        uint256 reward;
         uint256 value = deposits[msg.sender];
-        uint256 userReward = _takeTotalReward(msg.sender);
+        uint256[3] memory userRewards = _calculateRewards(msg.sender);
 
         deposits[msg.sender] = 0;
         totalDeposit -= value;
-        rewardPool -= userReward;
 
-        erc20Token.transfer(msg.sender, value + userReward);
-        emit Withdrawal(msg.sender, value, userReward);
+        for (uint8 i = 0; i < userRewards.length; i++) {
+            rewardPool -= userRewards[i];
+            reward += userRewards[i];
+            rewardPools[i] -= userRewards[i];
+        }
+
+        erc20Token.transfer(msg.sender, value + reward);
+        emit Withdrawal(msg.sender, value, reward);
 
         return true;
     }
