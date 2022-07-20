@@ -22,11 +22,22 @@ contract Bank is Ownable {
     event RewardSupplied(uint256 value);
     event TokensDeposited(address sender, uint256 value);
     event TokensWithdrew(address sender, uint256 value, uint256 reward);
+    event PoolsEmptied(uint256 value);
 
     constructor(uint256 _t, IERC20 _erc20Token) Ownable() {
         erc20Token = _erc20Token;
         t0 = block.timestamp;
         t = _t; // 1 == 1 seconds
+    }
+
+    modifier depositPeriod {
+        require(block.timestamp <= t0 + t, "Deposit period has ended");
+        _;
+    }
+
+    modifier withdrawPeriod {
+        require(block.timestamp > t0 + 2 * t, "Withdraw period has not started");
+        _;
     }
 
     function supplyReward(uint256 value) external onlyOwner returns (bool) {
@@ -46,16 +57,6 @@ contract Bank is Ownable {
         emit RewardSupplied(value);
 
         return true;
-    }
-
-    modifier depositPeriod {
-        require(block.timestamp <= t0 + t, "Deposit period has ended");
-        _;
-    }
-
-    modifier withdrawPeriod {
-        require(block.timestamp > t0 + 2 * t, "Withdraw period has not started");
-        _;
     }
 
     function withdraw() external withdrawPeriod returns (bool) {
@@ -86,6 +87,28 @@ contract Bank is Ownable {
         emit TokensDeposited(msg.sender, value);
 
         return true;
+    }
+
+    function emptyPools() external onlyOwner returns (bool) {
+      require(totalDeposit == 0, "Deposits not empty");
+      require(block.timestamp > t0 + 4 * t, "Round 3 not yet started");
+
+      uint256 value;
+
+      value += rewardPools[0];
+      value += rewardPools[1];
+      value += rewardPools[2];
+
+      rewardPools[0] = 0;
+      rewardPools[1] = 0;
+      rewardPools[2] = 0;
+
+      rewardPool = 0;
+
+      erc20Token.transfer(msg.sender, value);
+      emit PoolsEmptied(value);
+
+      return true;
     }
 
     function round() public view returns (uint8) {
