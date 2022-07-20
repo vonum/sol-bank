@@ -3,6 +3,7 @@
     "test": "mocha --exit --recursive"
   },
   "dependencies": {
+    "@alch/alchemy-web3": "^1.4.6",
     "@nomiclabs/hardhat-ethers": "^2.1.0",
     "@openzeppelin/contracts": "^4.7.0",
     "@openzeppelin/test-environment": "^0.1.9",
