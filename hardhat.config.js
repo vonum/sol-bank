@@ -1,5 +1,5 @@
 /** @type import('hardhat/config').HardhatUserConfig */
-require('dotenv').config();
+require("dotenv").config();
 require("@nomiclabs/hardhat-ethers");
 
 const { RINKEBY_API_URL, GOERLI_API_URL, PRIVATE_KEY } = process.env;
