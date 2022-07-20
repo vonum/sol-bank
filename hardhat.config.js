@@ -2,7 +2,7 @@
 require('dotenv').config();
 require("@nomiclabs/hardhat-ethers");
 
-const { API_URL, PRIVATE_KEY } = process.env;
+const { RINKEBY_API_URL, GOERLI_API_URL, PRIVATE_KEY } = process.env;
 
 module.exports = {
    solidity: "0.8.15",
@@ -10,7 +10,11 @@ module.exports = {
    networks: {
       hardhat: {},
       rinkeby: {
-         url: API_URL,
+         url: RINKEBY_API_URL,
+         accounts: [`0x${PRIVATE_KEY}`]
+      },
+      goerli: {
+         url: GOERLI_API_URL,
          accounts: [`0x${PRIVATE_KEY}`]
       }
    },
