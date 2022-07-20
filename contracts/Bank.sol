@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Bank is Ownable {
+    enum Round{ ROUND1, ROUND2, ROUND3 }
+
     IERC20 public immutable erc20Token;
 
     uint256 public immutable t;
@@ -91,11 +93,11 @@ contract Bank is Ownable {
         require(block.timestamp > t0 + 2 * _t, "Rounds not yet started");
 
         if (block.timestamp > t0 + 4 * _t) {
-            return 2;
+            return uint8(Round.ROUND3);
         } else if (block.timestamp > t0 + 3 * _t) {
-            return 1;
+            return uint8(Round.ROUND2);
         } else  {
-            return 0;
+            return uint8(Round.ROUND1);
         }
     }
 
