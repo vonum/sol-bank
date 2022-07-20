@@ -1,6 +1,7 @@
 /** @type import('hardhat/config').HardhatUserConfig */
 require("dotenv").config();
 require("@nomiclabs/hardhat-ethers");
+require("hardhat-docgen");
 
 const { RINKEBY_API_URL, GOERLI_API_URL, PRIVATE_KEY } = process.env;
 
@@ -18,4 +19,9 @@ module.exports = {
          accounts: [`0x${PRIVATE_KEY}`]
       }
    },
+  docgen: {
+    path: "./docs",
+    clear: true,
+    runOnCompile: true,
+  }
 }

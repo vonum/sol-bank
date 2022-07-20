@@ -18,3 +18,7 @@
 
 ### Truffle
 `truffle migrate --network rinkeby`
+
+## Generate docs
+1. `npx hardhat docgen`
+2. Open `docs/index.html`
