@@ -110,7 +110,7 @@ describe("Bank", () => {
 
       expectEvent(
         tx,
-        "Withdrawal",
+        "TokensWithdrew",
         {sender: user1, value: depositSize1.toString(), reward: "40"}
       );
     });

@@ -64,7 +64,7 @@ describe("Bank", () => {
 
       expectEvent(
         tx,
-        "Deposit",
+        "TokensDeposited",
         {sender: user, value: depositSize.toString()}
       );
     });

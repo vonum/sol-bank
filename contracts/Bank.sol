@@ -20,8 +20,8 @@ contract Bank is Ownable {
     mapping(address => uint256) public deposits;
 
     event RewardSupplied(uint256 value);
-    event Deposit(address sender, uint256 value);
-    event Withdrawal(address sender, uint256 value, uint256 reward);
+    event TokensDeposited(address sender, uint256 value);
+    event TokensWithdrew(address sender, uint256 value, uint256 reward);
 
     constructor(uint256 _t, IERC20 _erc20Token) Ownable() {
         erc20Token = _erc20Token;
@@ -73,7 +73,7 @@ contract Bank is Ownable {
         }
 
         erc20Token.transfer(msg.sender, value + reward);
-        emit Withdrawal(msg.sender, value, reward);
+        emit TokensWithdrew(msg.sender, value, reward);
 
         return true;
     }
@@ -83,7 +83,7 @@ contract Bank is Ownable {
 
         deposits[msg.sender] += value;
         totalDeposit += value;
-        emit Deposit(msg.sender, value);
+        emit TokensDeposited(msg.sender, value);
 
         return true;
     }
