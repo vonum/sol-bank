@@ -2,10 +2,13 @@
 
 pragma solidity ^0.8.15;
 
+import "./Percentages.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Bank is Ownable {
+    using Percentages for uint256;
+
     enum Round{ ROUND1, ROUND2, ROUND3 }
 
     IERC20 public immutable erc20Token;
@@ -44,9 +47,9 @@ contract Bank is Ownable {
         erc20Token.transferFrom(msg.sender, address(this), value);
         rewardPool += value;
 
-        uint256 pool1 = _calculateReward(value, 20);
-        uint256 pool2 = _calculateReward(value, 30);
-        uint256 pool3 = _calculateReward(value, 50);
+        uint256 pool1 = value.percentValue(20);
+        uint256 pool2 = value.percentValue(30);
+        uint256 pool3 = value.percentValue(50);
 
         rewardPools[0] = pool1;
         rewardPools[1] = pool2;
@@ -130,22 +133,14 @@ contract Bank is Ownable {
         // 0. get round
         // 1. calculate percent of deposit
         // 2. calculate percent of each reward pool
-        uint256 depositPercent = _calculatePercent(deposits[user], totalDeposit);
+        uint256 depositPercent = deposits[user].percent(totalDeposit);
 
         for (uint8 i = 0; i <= 2; i++) {
             if (i <= r) {
-                rewards[i] = _calculateReward(rewardPools[i], depositPercent);
+                rewards[i] = rewardPools[i].percentValue(depositPercent);
             }
         }
 
         return rewards;
-    }
-
-    function _calculateReward(uint256 pool, uint256 percent) private pure returns (uint256) {
-        return (pool * percent) / 100;
-    }
-
-    function _calculatePercent(uint256 part, uint256 total) private pure returns (uint256) {
-        return (part * 100) / total;
     }
 }
